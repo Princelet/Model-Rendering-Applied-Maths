@@ -28,8 +28,8 @@ void drawCube()
     glBegin(GL_POLYGON);
 
     glColor3f(1.0, 0.0, 0.0);     glVertex3f(0.5, -0.5, -0.5);      // P1 is red
-    glColor3f(0.0, 1.0, 0.0);     glVertex3f(0.5, 0.5, -0.5);      // P2 is green
-    glColor3f(0.0, 0.0, 1.0);     glVertex3f(-0.5, 0.5, -0.5);      // P3 is blue
+    glColor3f(1.0, 1.0, 0.0);      glVertex3f(0.5, 0.5, -0.5);        // P2 is orange
+    glColor3f(0.4, 0.0, 1.0);     glVertex3f(-0.5, 0.5, -0.5);      // P3 is indigo
     glColor3f(1.0, 0.0, 1.0);     glVertex3f(-0.5, -0.5, -0.5);      // P4 is purple
 
     glEnd();
@@ -52,9 +52,9 @@ void drawCube()
     glVertex3f(0.5, -0.5, 0.5);
     glEnd();
 
-    // Green side - LEFT
+    // Orange side - LEFT
     glBegin(GL_POLYGON);
-    glColor3f(0.0, 1.0, 0.0);
+    glColor3f(1.0, 1.0, 0.0);
     glVertex3f(-0.5, -0.5, 0.5);
     glVertex3f(-0.5, 0.5, 0.5);
     glVertex3f(-0.5, 0.5, -0.5);
@@ -88,10 +88,69 @@ void display() {
     //  Clear screen and Z-buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // ----------------------------------------------------------
+    // PROJECTION MATRIX
+    // ----------------------------------------------------------
+
+    // Setup
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    // Clipping planes, used for both ortho and perspective
+    float clipNear = 0.1f, clipFar = 100.0f;
+
+    // Orthographic view - no perspective
+    // Straight FOV
+    /*
+    float orthoLeft = -1, orthoRight = 1, orthoBottom = -1, orthoTop = 1;
+    glOrtho(orthoLeft, orthoRight, orthoBottom, orthoTop, 
+        clipNear, clipFar);
+    */
+
+    // Perspective view - different view based on camera position
+    float fov = 110, aspectRatio = windowWidth / windowHeight;
+    gluPerspective(fov, aspectRatio, clipNear, clipFar);
+
+
+    // ----------------------------------------------------------
+    // VIEW AND MODEL MATRICES COMBINED
+    // ----------------------------------------------------------
+
+    // Setup the matrix to be edited
+    glMatrixMode(GL_MODELVIEW);
+
 
     // Reset the matrix
     glLoadIdentity();
 
+
+    // ----------------------------------------------------------
+    // VIEW TRANSFORMS
+    // ----------------------------------------------------------
+
+    float cameraX = 0.0f, cameraY = 0.0f, cameraZ = -1.0f;
+    float lookX = 0.0f, lookY = 0.0f, lookZ = 0.0f;
+    float upX = 0.0f, upY = 1.0f, upZ = 0.0f;
+    gluLookAt(cameraX, cameraY, cameraZ,
+                    lookX, lookY, lookZ,
+                    upX, upY, upZ);
+
+
+
+    // ----------------------------------------------------------
+    // MODEL TRANSFORMS
+    // ----------------------------------------------------------
+
+    // Translate to set location
+    glTranslatef(-0.2f, 0.0f, 0.0f);
+
+    // Rotate to correct angles
+    glRotatef(rotate_y, 0.0f, 1.0f, 0.0f); // yaw (y-axis)
+    glRotatef(rotate_x, 1.0f, 0.0f, 0.0f);// pitch (x-axis)
+    glRotatef(10, 0.0f, 0.0f, 1.0f); // roll (z-axis)
+
+    // Scale to desired dimensions
+    glScalef(0.75f, 0.75f, 0.75f);
 
 
     // MODEL - draw the cube
